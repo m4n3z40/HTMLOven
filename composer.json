@@ -1,0 +1,21 @@
+{
+	"name": "m4n3z40/HTMLOven",
+	"description": "A simple PHP library for dynamic HTML generation.",
+	"keywords": ["HTML", "generation", "dynamic", "HTML builder", "builder"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Allan Marques",
+			"email": "allan.marques@ymail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0"
+	},
+	"require-dev": {
+        "mockery/mockery": ">=0.7.2"
+	},
+	"autoload": {
+		"psr-0": { "HTMLOven\\": "src/" }
+	}
+}
