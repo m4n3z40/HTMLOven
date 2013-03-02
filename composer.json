@@ -16,6 +16,6 @@
         "mockery/mockery": ">=0.7.2"
 	},
 	"autoload": {
-		"psr-0": { "HTMLOven\\": "src/" }
+		"psr-0": { "HTMLOven": "src/" }
 	}
 }
