@@ -1,7 +1,9 @@
 <?php 
 
 use \HTMLOven\HTMLElement;
-use \Mockery as m;
+use \HTMLOven\HTMLReference;
+use \HTMLOven\HTM5LReference;
+use \HTMLOven\XHTMLReference;
 
 class HTMLElementTest extends PHPUnit_Framework_TestCase
 {
@@ -10,11 +12,12 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->el = new HTMLElement;
+		$this->el->setHTMLReference( new HTMLReference );
 	}
 
 	public function testHTMLReferenceIsAccessibleAndMutable()
 	{
-		$reference = m::mock('HTMLOven\\HTMLReferenceInterface');
+		$reference = new HTMLReference;
 
 		//test if the element's HTML reference set correctly
 		$this->el->setHTMLReference($reference);
@@ -75,7 +78,6 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 
 	public function testClosableHTMLElementRendersCorrectly()
 	{
-		$this->el->setHTMLReference( $this->getHTMLReferenceMock('p', true) );
 		$this->el->setTagName('p');
 
 		//Test if the basic element renders correclty without text or attributes.
@@ -103,7 +105,6 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 
 	public function testUnclosableHTMLElementRendersCorrectly()
 	{
-		$this->el->setHTMLReference( $this->getHTMLReferenceMock('input', false) );
 		$this->el->setTagName('input');
 
 		//Test if the basic unclosable element renders correctly without attributes
@@ -132,28 +133,45 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('<input id="someId" class="some-class" disabled>', $this->el->render());
 	}
 
+	public function testXHTMLElementRendersCorrectly()
+	{
+		$this->el->setTagName('input');
+		$this->el->setHTMLReference( new XHTMLReference );
+
+		//Test if the basic unclosable element renders correctly without attributes
+		$this->assertEquals('<input/>', $this->el->render());
+
+		//Test if the unclosable element does not includes the inner text, even if it is set
+		$this->el->setText('Im a content!');
+		$this->assertEquals('<input/>', $this->el->render());
+
+		//Test if the unclosable element renders correnctly with attributes
+		$this->el->addAttribute('id', 'someId');
+		$this->el->addAttribute('class', 'some-class');
+		$this->assertEquals('<input id="someId" class="some-class"/>', $this->el->render());
+
+		//Test if attributes that doesn't need values, doesn't get values (HTML5 default), 
+		$this->el->addAttribute('disabled');
+		$this->assertEquals(
+			'<input id="someId" class="some-class" disabled="disabled"/>', 
+			$this->el->render()
+		);
+
+		//Test if attributes that doesn't need values, doesn't get values (HTML5 default, ALTERNATIVE WAY), 
+		$this->el->clearAttributes();
+		$this->el->setAttributes(array(
+			'id' => 'someId',
+			'class' => 'some-class',
+			'disabled'
+		));
+		$this->assertEquals(
+			'<input id="someId" class="some-class" disabled="disabled"/>', 
+			$this->el->render()
+		);
+	}
+
 	public function tearDown()
 	{
 		$this->el = null;
-		m::close();
-	}
-
-	protected function getHTMLReferenceMock($tagName, $needsClosingTag)
-	{
-		$reference = m::mock('HTMLOven\\HTMLReferenceInterface');
-
-		$reference->shouldReceive('needsClosingTag')
-				  ->with($tagName)
-				  ->andReturn($needsClosingTag);
-
-		$reference->shouldReceive('innerTextAllowed')
-				  ->with($tagName)
-				  ->andReturn($needsClosingTag);
-
-		$reference->shouldReceive('optionalValuesAllowed')
-				  ->withNoArgs()
-				  ->andReturn(true);
-
-		return $reference;
 	}
 }

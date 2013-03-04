@@ -5,14 +5,14 @@ interface HTMLElementInterface
 	/**
 	 * Sets the HTML reference for HTML validators compliance
 	 * 
-	 * @param HTMLReferenceInterface $reference the HTMLReference object
+	 * @param HTMLReference $reference the HTMLReference object
 	 */
-	function setHTMLReference(HTMLReferenceInterface $reference);
+	function setHTMLReference(HTMLReference $reference);
 
 	/**
 	 * Gets the HTML reference for HTML validators compliance
 	 * 
-	 * @return HTMLReferenceInterface the HTMLReference object
+	 * @return HTMLReference the HTMLReference object
 	 */
 	function getHTMLReference();
 

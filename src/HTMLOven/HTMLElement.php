@@ -5,7 +5,7 @@ class HTMLElement implements HTMLElementInterface
 	/**
 	 * The HTML reference for HTML validators compliance
 	 * 
-	 * @var HTMLReferenceInterface
+	 * @var HTMLReference
 	 */
 	protected $reference;
 
@@ -29,7 +29,7 @@ class HTMLElement implements HTMLElementInterface
 
 
 	public function __construct(
-		$tagName = 'div', $attributes = array(), $text = '', HTMLReferenceInterface $reference = null
+		$tagName = 'div', $attributes = array(), $text = '', HTMLReference $reference = null
 	) {
 
 		$this->setTagName($tagName);
@@ -44,9 +44,9 @@ class HTMLElement implements HTMLElementInterface
 	/**
 	 * Sets the HTML reference for HTML validators compliance
 	 * 
-	 * @param HTMLReferenceInterface $reference the HTMLReference object
+	 * @param HTMLReference $reference the HTMLReference object
 	 */
-	public function setHTMLReference(HTMLReferenceInterface $reference)
+	public function setHTMLReference(HTMLReference $reference)
 	{
 		$this->reference = $reference;
 	}
@@ -54,7 +54,7 @@ class HTMLElement implements HTMLElementInterface
 	/**
 	 * Gets the HTML reference for HTML validators compliance
 	 * 
-	 * @return HTMLReferenceInterface the HTMLReference object
+	 * @return HTMLReference the HTMLReference object
 	 */
 	public function getHTMLReference()
 	{
@@ -207,20 +207,7 @@ class HTMLElement implements HTMLElementInterface
 	 */
 	public function render()
 	{
-		$html = "<{$this->tagName}";
-
-		if ( count( $this->attributes ) > 0 )
-			$html .= ' ' . $this->compileAttributes();
-
-		$html .= '>';
-
-		if ( $this->reference->innerTextAllowed($this->tagName) and $this->text != '' )
-			$html .= $this->escape($this->text);
-
-		if ( $this->reference->needsClosingTag($this->tagName) )
-			$html .= "</{$this->tagName}>";
-
-		return $html;
+		return $this->reference->render( $this );
 	}
 
 	/**
@@ -231,63 +218,5 @@ class HTMLElement implements HTMLElementInterface
 	public function __toString()
 	{
 		return $this->render();
-	}
-
-	/**
-	 * Escapes the string content
-	 * 
-	 * @param  string $string the string to be escaped
-	 * @return string         the escaped string
-	 */
-	protected function escape($string)
-	{
-		return htmlentities( (string)$string );
-	}
-
-	/**
-	 * Decodes the escaped string content
-	 * 
-	 * @param  string $string the escaped string
-	 * @return string         the decoded string
-	 */
-	protected function unescape($string)
-	{
-		return html_entity_decode( (string)$string );
-	}
-
-	/**
-	 * Compile the element's attributes array to a string of html attributes
-	 * 
-	 * @return string the compiled string
-	 */
-	protected function compileAttributes()
-	{
-		$attrs = array();
-
-		$optionalValuesAllowed = $this->reference->optionalValuesAllowed();
-
-		foreach ($this->attributes as $name => $value) {
-
-			if ( $value == '' ) {
-
-				$attrs[] = $optionalValuesAllowed ? 
-						   $this->escape($name) : 
-						   $this->escape($name) . '="' . $this->escape($name) . '"';
-
-			} elseif( is_numeric($name) ) {
-
-				$attrs[] = $optionalValuesAllowed ? 
-						   $this->escape($value) : 
-						   $this->escape($value) . '="' . $this->escape($value) . '"';
-
-			} else {
-
-				$attrs[] = $this->escape($name) . '="' . $this->escape($value) . '"';
-				
-			}
-
-		}
-
-		return implode(' ', $attrs);
 	}
 }
