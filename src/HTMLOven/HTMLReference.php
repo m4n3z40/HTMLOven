@@ -2,8 +2,40 @@
 
 class HTMLReference
 {
+	/**
+	 * The array representing the tag reference
+	 *
+	 * <code>
+	 * array(
+	 *	'div' => array(
+	 *		'tagName' => 'div',
+	 *	  	'hasClosingTag' => true,
+	 *	),
+	 *	'p' => array(
+	 *		'tagName' => 'p',
+	 *  	'hasClosingTag' => true,
+     * 	),
+     * )
+	 * </code>
+	 * 
+	 * @var array
+	 */
 	protected $tags = array();
+
+	/**
+	 * An indicator that the values on attributes tha can be omited, 
+	 * should be omited or not.
+	 * 
+	 * @var boolean
+	 */
 	protected $valueOnOptionals = false;
+
+	/**
+	 * An indicator that the elements that doesn't have closing tags, 
+	 * should be have a closing slash or not.
+	 * 
+	 * @var boolean
+	 */
 	protected $slashOnUnclosables = false;
 
 	public function __construct(array $tags = array())
@@ -60,7 +92,7 @@ class HTMLReference
 		$tagName = (string)$tagName;
 
 		if ( $this->hasTag($tagName) ) {
-			return $this->tags[ (string)$tagName ];
+			return $this->tags[ $tagName ];
 		}
 	}
 
@@ -75,7 +107,7 @@ class HTMLReference
 		$tagName = (string)$tagName;
 
 		if ( $this->hasTag($tagName) ) {
-			return $this->tags[ (string)$tagName ];
+			return $this->tags[ $tagName ];
 		}
 	}
 

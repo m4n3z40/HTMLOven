@@ -150,14 +150,14 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 		$this->el->addAttribute('class', 'some-class');
 		$this->assertEquals('<input id="someId" class="some-class"/>', $this->el->render());
 
-		//Test if attributes that doesn't need values, doesn't get values (HTML5 default), 
+		//Test if attributes that doesn't need values, gets the values (XHTML default), 
 		$this->el->addAttribute('disabled');
 		$this->assertEquals(
 			'<input id="someId" class="some-class" disabled="disabled"/>', 
 			$this->el->render()
 		);
 
-		//Test if attributes that doesn't need values, doesn't get values (HTML5 default, ALTERNATIVE WAY), 
+		//Test if attributes that doesn't need values, gets the values (XHTML default, ALTERNATIVE WAY), 
 		$this->el->clearAttributes();
 		$this->el->setAttributes(array(
 			'id' => 'someId',
