@@ -2,7 +2,7 @@
 
 use \HTMLOven\HTMLElement;
 use \HTMLOven\HTMLReference;
-use \HTMLOven\HTM5LReference;
+use \HTMLOven\HTML5Reference;
 use \HTMLOven\XHTMLReference;
 
 class HTMLElementTest extends PHPUnit_Framework_TestCase
@@ -12,12 +12,11 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->el = new HTMLElement;
-		$this->el->setHTMLReference( new HTMLReference );
 	}
 
 	public function testHTMLReferenceIsAccessibleAndMutable()
 	{
-		$reference = new HTMLReference;
+		$reference = HTMLReference::of('html5');
 
 		//test if the element's HTML reference set correctly
 		$this->el->setHTMLReference($reference);
@@ -136,7 +135,7 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 	public function testXHTMLElementRendersCorrectly()
 	{
 		$this->el->setTagName('input');
-		$this->el->setHTMLReference( new XHTMLReference );
+		$this->el->setHTMLReference( HTMLReference::of('xhtml') );
 
 		//Test if the basic unclosable element renders correctly without attributes
 		$this->assertEquals('<input/>', $this->el->render());

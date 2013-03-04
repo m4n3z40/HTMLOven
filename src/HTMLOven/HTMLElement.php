@@ -37,7 +37,9 @@ class HTMLElement implements HTMLElementInterface
 		$this->setText($text);
 
 		if ( ! is_null($reference) )
-			$this->setHTMLReference($reference);
+			$this->setHTMLReference( $reference );
+		else
+			$this->setHTMLReference( HTMLReference::of('html5') );
 
 	}
 

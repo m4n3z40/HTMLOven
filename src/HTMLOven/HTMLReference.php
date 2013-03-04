@@ -264,4 +264,21 @@ class HTMLReference
 		);
 	}
 
+	/**
+	 * Factory: Creates an child instance of the HTMLReference class
+	 * @param  string $referenceName the HTMLReference class name
+	 * @param  array  $data          the initial data (tag references)
+	 * @return HTMLReference
+	 */
+	public static function of($referenceName, array $data = array())
+	{
+		$referenceName = strtoupper(trim( (string)$referenceName ));
+
+		$classSuffix = 'Reference';
+
+		$className = __NAMESPACE__ . '\\' . $referenceName . $classSuffix;
+
+		return new $className( $data );
+	}
+
 }
