@@ -1,6 +1,8 @@
 <?php namespace HTMLOven;
 
-class HTMLElement implements HTMLElementInterface
+use InvalidArgumentException;
+
+class HTMLElement implements HTMLElementInterface, HTMLElementCollectionInterface
 {
 	/**
 	 * The HTML reference for HTML validators compliance
@@ -27,6 +29,12 @@ class HTMLElement implements HTMLElementInterface
 	 */
 	protected $attributes = array();
 
+	/**
+	 * The list of child elements that the element has
+	 * @var array
+	 */
+	protected $children = array();
+
 
 	public function __construct(
 		$tagName = 'div', $attributes = array(), $text = '', HTMLReference $reference = null
@@ -41,6 +49,126 @@ class HTMLElement implements HTMLElementInterface
 		else
 			$this->setHTMLReference( HTMLReference::of('html5') );
 
+	}
+
+	/**
+	 * Sets all children of the element
+	 * 
+	 * @param array $children The array of children elements
+	 */
+	public function setChildren(array $children)
+	{
+		$this->clearChildren();
+
+		foreach ($children as $child) {
+			$this->addChild($child);
+		}
+	}
+
+	/**
+	 * Gets all children of the element
+	 * 
+	 * @return array all Array of children elements
+	 */
+	public function getChildren()
+	{
+		return $this->children;
+	}
+
+	/**
+	 * Add a child element to the element
+	 * 
+	 * @param HTMLElementInterface $reference the child element
+	 */
+	public function addChild(HTMLElementInterface $element)
+	{
+		if ( ! $this->reference->closingTag( $this->tagName ) )
+			throw new InvalidArgumentException('Children is not allowed in a "' . $this->tagName . '" element.');
+
+		$this->children[] = $element;
+	}
+
+	/**
+	 * Returns the first child of the children list
+	 * 
+	 * @return HTMLElementInterface
+	 */
+	public function firstChild()
+	{
+		return $this->hasChildren() ? reset($this->children) : null;
+	}
+
+	/**
+	 * Returns the last child of the children list
+	 * 
+	 * @return HTMLElementInterface
+	 */
+	public function lastChild()
+	{
+		return $this->hasChildren() ? end($this->children) : null;
+	}
+
+	/**
+	 * Returns the total number of child elements that the element has
+	 * 
+	 * @return int
+	 */
+	public function countChildren()
+	{
+		return count($this->children);
+	}
+
+	/**
+	 * Removes all children from the element
+	 * 
+	 * @return void
+	 */
+	public function clearChildren()
+	{
+		$this->children = array();
+	}
+
+	/**
+	 * Returns an indicator that the children list has any child
+	 * 
+	 * @return boolean
+	 */
+	public function hasChildren()
+	{
+		return $this->countChildren() > 0;
+	}
+
+	/**
+	 * Execute a callback over each child.
+	 * 
+	 * @param  Closure $callback th callback
+	 * @return void
+	 */
+	public function eachChild($callback)
+	{
+		array_map($callback, $this->children);
+	}
+
+	/**
+	 * Runs a map over each child.
+	 * 
+	 * @param  Closure $callback the callback
+	 * @return array           the resulting map
+	 */
+	public function mapChildren($callback)
+	{
+		return array_map($callback, $this->children);
+	}
+
+	/**
+	 * Runs a filter over each child.
+	 * 
+	 * @param  Closure $callback the filter callback
+	 * @return void
+	 */
+	public function filterChildren($callback)
+	{
+		$this->setChildren( array_filter($this->children, $callback) );
 	}
 
 	/**
@@ -195,7 +323,7 @@ class HTMLElement implements HTMLElementInterface
 	 * Returns if a attribute with the given name has been added to the element
 	 * 
 	 * @param  string  $name the attribute's name
-	 * @return boolean       true if found, false if note
+	 * @return boolean       true if found, false if not
 	 */
 	public function hasAttribute($name)
 	{

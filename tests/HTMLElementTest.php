@@ -169,6 +169,125 @@ class HTMLElementTest extends PHPUnit_Framework_TestCase
 		);
 	}
 
+	public function testChildrenAreAccessibleAndMutable()
+	{
+		//Basic setting and getting tests
+		$child1 = new HTMLElement('span');
+		$child2 = new HTMLElement('p');
+		$child3 = new HTMLElement('input');
+
+		//Testing adding a child
+		$this->el->addChild( $child1 );
+
+		$this->assertEquals(array($child1), $this->el->getChildren());
+
+		//Testing seting multiple children
+		$this->el->setChildren(array($child1, $child2));
+
+		$this->assertEquals(array($child1, $child2), $this->el->getChildren());
+		$this->assertEquals(2, $this->el->countChildren());
+
+		//Testing clearing children
+		$this->el->clearChildren();
+
+		$this->assertFalse($this->el->hasChildren());
+
+		//Testing first and last child getters
+		$this->el->setChildren(array($child1, $child2, $child3));
+
+		$this->assertEquals($child1, $this->el->firstChild());
+		$this->assertEquals($child3, $this->el->lastChild());
+	}
+
+	public function testChildrenBatchMutatorAndTraversalMethodsWorksCorrectly()
+	{		
+		$this->el->setChildren(array(
+			new HTMLElement('span'),
+			new HTMLElement('p'),
+			new HTMLElement('input')
+		));
+
+		//Testing mutator for each child, aplying callback for each child
+		$this->el->eachChild(function($childEl)
+		{
+			$childEl->setText('Im an inner text!');
+		});
+
+		foreach ($this->el->getChildren() as $childEl) {
+			$this->assertEquals('Im an inner text!', $childEl->getText());
+		}
+
+		//Testing map over each child
+		$map = $this->el->mapChildren(function($childEl)
+		{
+			$childEl = clone $childEl;
+
+			$childEl->setText('Inner text changed!');
+
+			return $childEl;
+		});
+
+		foreach ($this->el->getChildren() as $i => $childEl) {			
+			$this->assertEquals('Im an inner text!', $childEl->getText());
+			$this->assertEquals('Inner text changed!', $map[$i]->getText());
+		}
+
+		//Testing filter on children
+		$this->el->filterChildren(function($childEl)
+		{
+			return $childEl->getTagName() === 'input';
+		});
+
+		$this->assertEquals(1, $this->el->countChildren());
+		$this->assertEquals('input', $this->el->firstChild()->getTagName());
+	}
+
+	public function testChildrenElementsAreRenderedCorrectly()
+	{
+		//Test simple children redering
+		$childEl1 = new HTMLElement('h3');
+		$childEl1->setText('This is a title');
+
+		$childEl2 = new HTMLElement('p');
+		$childEl2->setText('This is a content.');
+
+		$this->el->addChild( $childEl1 );
+		$this->el->addChild( $childEl2 );
+
+		$this->assertEquals(
+			'<div><h3>This is a title</h3><p>This is a content.</p></div>',
+			$this->el->render()
+		);
+
+		//Test attributes children rendering
+		$this->el->firstChild()->addAttribute('class', 'title');
+		$this->el->lastChild()->addAttribute('class', 'pretty-paragraph');
+		$this->el->lastChild()->addAttribute('id', 'p1');
+
+		$this->assertEquals(
+			'<div><h3 class="title">This is a title</h3><p class="pretty-paragraph" id="p1">This is a content.</p></div>',
+			$this->el->render()
+		);
+
+		//Test deep childs
+		$this->el->firstChild()->addChild( new HTMLElement('span', array(), 'DEEP!') );
+
+		$this->assertEquals(
+			'<div><h3 class="title">This is a title<span>DEEP!</span></h3><p class="pretty-paragraph" id="p1">This is a content.</p></div>',
+			$this->el->render()
+		);
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testThrowsExceptionWhenAddingChildOnUnclosables()
+	{
+		$this->el->setTagName('input');
+
+		$this->el->addChild( new HTMLElement );
+	}
+
 	public function tearDown()
 	{
 		$this->el = null;

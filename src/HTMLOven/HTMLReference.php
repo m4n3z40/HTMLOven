@@ -155,6 +155,11 @@ class HTMLReference
 
 			$html .= '>';
 			$html .= $this->escape( $element->getText() );
+
+			foreach ($element->getChildren() as $child) {
+				$html .= $child->render();
+			}
+
 			$html .= "</{$element->getTagName()}>";
 
 		} elseif ( $this->slashOnUnclosables ) {
@@ -182,6 +187,23 @@ class HTMLReference
 	}
 
 	/**
+	 * Returns a indicator tha the tag passed as param needs a closing tag or not
+	 * 
+	 * @param  string $tagName the tag name
+	 * @return bool
+	 */
+	public function closingTag( $tagName )
+	{
+		$tagName = (string)$tagName;
+
+		if ( $this->hasTag($tagName) and isset( $this->tags[ $tagName ]['hasClosingTag'] ) ) {
+		   return $this->tags[ $tagName ]['hasClosingTag'];
+		}
+
+		return true;
+	}
+
+	/**
 	 * Escapes the string content
 	 * 
 	 * @param  string $string the string to be escaped
@@ -201,23 +223,6 @@ class HTMLReference
 	protected function unescape($string)
 	{
 		return html_entity_decode( (string)$string, ENT_QUOTES, 'UTF-8' );
-	}
-
-	/**
-	 * Returns a indicator tha the tag passed as param needs a closing tag or not
-	 * 
-	 * @param  string $tagName the tag name
-	 * @return bool
-	 */
-	protected function closingTag( $tagName )
-	{
-		$tagName = (string)$tagName;
-
-		if ( $this->hasTag($tagName) and isset( $this->tags[ $tagName ]['hasClosingTag'] ) ) {
-		   return $this->tags[ $tagName ]['hasClosingTag'];
-		}
-
-		return true;
 	}
 
 	/**
